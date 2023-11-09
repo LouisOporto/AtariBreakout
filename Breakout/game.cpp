@@ -92,24 +92,27 @@ void Game::Start() {
 			accumalator += dt;
 			if (state_ == GameState::kInProgress) {
 				//Run game logic here
-				if (ball->GetX() < 0 || ball->GetX() + ball->GetWidth() >= kSize) speed_x_ *= -1;
+				if (ball->GetX() <= 0 || ball->GetX() + ball->GetWidth() >= kSize) speed_x_ *= -1;
 				if (ball->GetY() <= 0) speed_y_ *= -1;
 				else if (ball->GetY() + ball->GetHeight() >= kSize) state_ = GameState::kLost;
 
-				if (ball->CollidesWith(paddle)) speed_y_ *= -1;
+				if (ball->CollidesWith(paddle)) {
+					if (ball->CollidesWithX(paddle)) speed_x_ *= -1;
+					else speed_y_ *= -1;
+				}
 				for (auto it = bricks_.begin(); it != bricks_.end();) {
 					if (ball->CollidesWith(*it)) {
 						if (ball->CollidesWithX(*it)) speed_x_ *= -1;
+						else speed_y_ *= -1;
 						it = bricks_.erase(it);
-						speed_y_ *= -1;
 					}
 					else it++;
 				}
 
 				if (bricks_.size() == 0) state_ = GameState::kWon;
 
-				ball->SetX(ball->GetX() + speed_x_ * 60.f * dt);
-				ball->SetY(ball->GetY() + speed_y_ * 60.f * dt);
+				ball->SetX(ball->GetX() + speed_x_ * 60.0f * dt);
+				ball->SetY(ball->GetY() + speed_y_ * 60.0f * dt);
 			}
 
 			//Draw here after a set amount of time has elapsed

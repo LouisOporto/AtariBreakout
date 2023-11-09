@@ -5,7 +5,10 @@
 bool Object::CollidesWith (const Object* other) const {
 	if (other->GetWidth() == 0 || other->GetHeight() == 0 || GetWidth() == 0 || GetHeight() == 0) return false;
 	// Origin must be bigger than bottom right of other object
-	if (GetX() < other->GetX() + other->GetWidth() && GetX() + GetWidth() > other->GetX() && GetY() < other->GetY() + other->GetHeight() && GetY() + GetHeight() > other->GetY()) return true;
+	if (GetX() < other->GetX() + other->GetWidth() && 
+		GetX() + GetWidth() > other->GetX() && 
+		GetY() < other->GetY() + other->GetHeight() && 
+		GetY() + GetHeight() > other->GetY()) return true;
 	return false;
 }
 
@@ -13,12 +16,21 @@ bool Object::CollidesWith (const Object* other) const {
 bool Object::CollidesWithX  (const Object* other) const {
 	if (other->GetWidth() == 0 || other->GetHeight() == 0 || GetWidth() == 0 || GetHeight() == 0) return false;
 	// Origin must be bigger than bottom right of other object
-	float x = std::max(std::abs(GetX() - (other->GetX() + other->GetWidth())),std::abs(GetX() + GetWidth() - other->GetX()));
-	std::cout << "xDelta:" << x << '\n';
-	float y = std::max(GetY() - (std::abs(other->GetY() + other->GetHeight())), std::abs(GetY() + GetHeight() - other->GetY()));
-	std::cout << "yDelta:" << y << '\n';
-	if(x < y) return true;
-	return false;
+	float left = std::abs(other->GetX() - GetX() - GetWidth());
+	float right = std::abs(other->GetX() + other->GetWidth() - GetX());
+	float bot = std::abs(other->GetY() + other->GetHeight() - GetY());
+	float top = std::abs(other->GetY() - GetY() - GetHeight());
+	
+	float wall = std::min(left, right);
+	float level = std::min(top, bot);
+	std::cout << "Collision Flip\n";
+	//std::cout << "Wall:" << wall << " & " << "Level:" << level << '\n';
+	if (wall < level) { // Ball is on the side of object
+		return true;
+	}
+	else { // Ball is either on top our below the object
+		return false;
+	}
 }
 
 void Brick::Draw() const {
