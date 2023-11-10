@@ -75,7 +75,6 @@ void Game::Start() {
 
 	while (window_.isOpen()) {
 		dt = clock.restart().asSeconds();
-		std::cout << "dt:" << dt << '\n';
 		sf::Event event;
 		if (window_.pollEvent(event)) {
 			if (event.type == sf::Event::Closed) {

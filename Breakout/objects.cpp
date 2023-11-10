@@ -23,7 +23,6 @@ bool Object::CollidesWithX  (const Object* other) {
 	
 	float wall = std::min(left, right);
 	float level = std::min(top, bot);
-	std::cout << "Collision Flip\n";
 	//std::cout << "Wall:" << wall << " & " << "Level:" << level << '\n';
 	if (wall < level) { // Ball is on the side of object
 		if (wall == left) SetX(GetX() - wall);
