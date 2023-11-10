@@ -13,7 +13,7 @@ bool Object::CollidesWith (const Object* other) const {
 }
 
 // Need to improve code for collision on the sides of bricks.
-bool Object::CollidesWithX  (const Object* other) const {
+bool Object::CollidesWithX  (const Object* other) {
 	if (other->GetWidth() == 0 || other->GetHeight() == 0 || GetWidth() == 0 || GetHeight() == 0) return false;
 	// Origin must be bigger than bottom right of other object
 	float left = std::abs(other->GetX() - GetX() - GetWidth());
@@ -26,9 +26,13 @@ bool Object::CollidesWithX  (const Object* other) const {
 	std::cout << "Collision Flip\n";
 	//std::cout << "Wall:" << wall << " & " << "Level:" << level << '\n';
 	if (wall < level) { // Ball is on the side of object
+		if (wall == left) SetX(GetX() - wall);
+		else SetX(GetX() + wall);
 		return true;
 	}
 	else { // Ball is either on top our below the object
+		if (level == top) SetY(GetY() - level);
+		else SetY(GetY() + level);
 		return false;
 	}
 }

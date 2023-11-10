@@ -3,6 +3,9 @@
 #include <iostream>
 #include <set>
 #include <vector>
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 
 const float kSize = 500;
 const int kBrickHeight = 20;
@@ -72,13 +75,13 @@ void Game::Start() {
 
 	while (window_.isOpen()) {
 		dt = clock.restart().asSeconds();
-
+		std::cout << "dt:" << dt << '\n';
 		sf::Event event;
 		if (window_.pollEvent(event)) {
 			if (event.type == sf::Event::Closed) {
 				window_.close();
 			}
-			if (event.type == sf::Event::MouseMoved) paddle->SetX(event.mouseMove.x);
+			if (event.type == sf::Event::MouseMoved) paddle->SetX(event.mouseMove.x - (kPaddleWidth / 2));
 			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
 				if(state_ == GameState::kNotStarted) state_ = GameState::kInProgress;
 			}
@@ -92,18 +95,33 @@ void Game::Start() {
 			accumalator += dt;
 			if (state_ == GameState::kInProgress) {
 				//Run game logic here
-				if (ball->GetX() <= 0 || ball->GetX() + ball->GetWidth() >= kSize) speed_x_ *= -1;
+				if (ball->GetX() <= 0 || ball->GetX() + ball->GetWidth() >= kSize) {
+					ball->SetX(ball->GetX() <= 0 ? 1 : kSize - ball->GetWidth() - 1);
+					speed_x_ *= -1;
+				}
 				if (ball->GetY() <= 0) speed_y_ *= -1;
 				else if (ball->GetY() + ball->GetHeight() >= kSize) state_ = GameState::kLost;
 
 				if (ball->CollidesWith(paddle)) {
 					if (ball->CollidesWithX(paddle)) speed_x_ *= -1;
-					else speed_y_ *= -1;
+					else {
+						float offset = (ball->GetX() + kInitialSpeed - paddle->GetX()) / (kPaddleWidth + kBallDiameter);
+						float phi = 0.25 * M_PI * (2 * offset - 1);
+
+						speed_x_ = kInitialSpeed * sin(phi);
+						speed_y_ *= -1;
+					}
 				}
 				for (auto it = bricks_.begin(); it != bricks_.end();) {
 					if (ball->CollidesWith(*it)) {
 						if (ball->CollidesWithX(*it)) speed_x_ *= -1;
-						else speed_y_ *= -1;
+						else {
+							float offset = (ball->GetX() + kInitialSpeed - paddle->GetX()) / (kPaddleWidth + kBallDiameter);
+							float phi = 0.25 * M_PI * (2 * offset - 1);
+
+							speed_x_ = -kInitialSpeed * sin(phi);
+							speed_y_ *= -1;
+						}
 						it = bricks_.erase(it);
 					}
 					else it++;

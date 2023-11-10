@@ -17,7 +17,7 @@ public:
 	virtual void Draw() const = 0; // Pure Function
 
 	bool CollidesWith(const Object* other) const;
-	bool CollidesWithX(const Object* other) const;
+	bool CollidesWithX(const Object* other);
 
 protected:
 	sf::RenderWindow* GetWindow() const { return window_; }
